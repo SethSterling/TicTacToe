@@ -131,6 +131,7 @@
         android:id="@+id/NewGameButton"
         android:layout_width="384dp"
         android:layout_height="70dp"
+        android:onClick="ResetGame"
         android:text="New Game"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

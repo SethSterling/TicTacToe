@@ -3,8 +3,10 @@ package com.example.tictactoe;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private Button BottomLeft;
     private Button BottomCenter;
     private Button BottomRight;
-
-    Button[] buttons = {TopLeft, TopCenter, TopRight, MiddleLeft, MiddleCenter, MiddleRight, BottomLeft, BottomCenter, BottomRight};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OnClick(View v){
+        Button[] buttons = {TopLeft, TopCenter, TopRight, MiddleLeft, MiddleCenter, MiddleRight, BottomLeft, BottomCenter, BottomRight};
+        Button clickedButton = FindClickedButton(v, buttons);
+        if(clickedButton != null && clickedButton.getText().equals("")){
+            MarkBox(clickedButton);
+            SwapPlayers();
+        }
+    }
 
+    private Button FindClickedButton(View v, Button[] buttons){
+        for(int i = 0; i < buttons.length; i++) {
+            if(v == buttons[i]) {
+                return buttons[i];
+            }
+        }
+        return null;
+    }
+
+    private void MarkBox(Button button){
+        button.setText(currTurn);
+    }
+
+    private void SwapPlayers(){
+        if(currTurn == XS){
+            currTurn = OS;
+        }
+        else{
+            currTurn = XS;
+        }
+        playerTurn.setText("Player " + currTurn + "'s Turn");
+    }
+
+    public void ResetGame(View v){
+        Button[] buttons = {TopLeft, TopCenter, TopRight, MiddleLeft, MiddleCenter, MiddleRight, BottomLeft, BottomCenter, BottomRight};
+        for (Button b: buttons) {
+            b.setText("");
+        }
+        if(currTurn == OS){
+            SwapPlayers();
+        }
     }
 }
