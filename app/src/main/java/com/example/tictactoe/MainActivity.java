@@ -3,15 +3,15 @@ package com.example.tictactoe;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.os.Message;
 import android.view.View;
 import android.widget.Button;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private final String XS = "X";
     private final String OS = "O";
+    private final int NUMBOXESPERROW = 3;
+    private final int MIDDLECENTERINDEX = 4;
 
     private String currTurn;
     private TextView playerTurn;
@@ -49,18 +49,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void OnClick(View v){
-        Button[] buttons = {TopLeft, TopCenter, TopRight, MiddleLeft, MiddleCenter, MiddleRight, BottomLeft, BottomCenter, BottomRight};
-        Button clickedButton = FindClickedButton(v, buttons);
-        if(clickedButton != null && clickedButton.getText().equals("")){
+        Button[] boxes = {TopLeft, TopCenter, TopRight, MiddleLeft, MiddleCenter, MiddleRight, BottomLeft, BottomCenter, BottomRight};
+        Button clickedButton = FindClickedButton(v, boxes);
+        if(clickedButton != null && clickedButton.getText().equals("") ){
             MarkBox(clickedButton);
-            SwapPlayers();
+            if(hasWon(boxes)){
+                //Declare a winner
+                DisableBoxes(boxes);
+                DisplayResults(currTurn + " Wins");
+            }
+
+            else if(AllBoxesFilled(boxes)){
+                DisableBoxes(boxes);
+                DisplayResults("It's a Tie");
+            }
+
+            else {
+                SwapPlayers();
+            }
         }
     }
 
+    private boolean AllBoxesFilled(Button[] buttons) {
+        for(Button b : buttons){
+            if(b.getText() == ""){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void DisableBoxes(Button[] boxes) {
+        for (Button b: boxes) {
+            b.setClickable(false);
+        }
+    }
+
+    private void EnableBoxes(Button[] boxes) {
+        for (Button b: boxes) {
+            b.setClickable(true);
+        }
+    }
+
+    private void DisplayResults(String message) {
+        playerTurn.setText(message);
+    }
+
     private Button FindClickedButton(View v, Button[] buttons){
-        for(int i = 0; i < buttons.length; i++) {
-            if(v == buttons[i]) {
-                return buttons[i];
+        for (Button button : buttons) {
+            if (v == button) {
+                return button;
             }
         }
         return null;
@@ -71,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void SwapPlayers(){
-        if(currTurn == XS){
+        if(currTurn.equals(XS)){
             currTurn = OS;
         }
         else{
@@ -85,8 +123,48 @@ public class MainActivity extends AppCompatActivity {
         for (Button b: buttons) {
             b.setText("");
         }
-        if(currTurn == OS){
+        if(currTurn.equals(OS)){
             SwapPlayers();
         }
+        else{
+            playerTurn.setText("Player " + currTurn + "'s Turn");
+        }
+        EnableBoxes(buttons);
+    }
+    public boolean hasWon(Button[] boxes){
+        return ThreeInRow(boxes) ||
+               ThreeInCol(boxes) ||
+               ThreeInDia(boxes);
+    }
+
+    private boolean ThreeInDia(Button[] boxes) {
+        return (boxes[MIDDLECENTERINDEX].getText().equals(currTurn) &&
+                boxes[MIDDLECENTERINDEX - 4].getText().equals(currTurn) &&
+                boxes[MIDDLECENTERINDEX + 4].getText().equals((currTurn))) ||
+                (boxes[MIDDLECENTERINDEX].getText().equals(currTurn) &&
+                boxes[MIDDLECENTERINDEX - 2].getText().equals(currTurn) &&
+                boxes[MIDDLECENTERINDEX + 2].getText().equals(currTurn));
+    }
+
+    private boolean ThreeInCol(Button[] boxes) {
+        for(int i = 0; i < NUMBOXESPERROW; i++){
+            if(boxes[i].getText().equals(currTurn) &&
+                    boxes[i + 3].getText().equals(currTurn) &&
+                    boxes[i + 6].getText().equals((currTurn))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean ThreeInRow(Button[] boxes) {
+        for(int i = 0; i < boxes.length; i += 3){
+            if(boxes[i].getText().equals(currTurn) &&
+                    boxes[i + 1].getText().equals(currTurn) &&
+                    boxes[i + 2].getText().equals((currTurn))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
